@@ -28,161 +28,172 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoginForm));
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.chkShowPassword = new System.Windows.Forms.CheckBox();
-            this.btnLogin = new System.Windows.Forms.Button();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.panel2.SuspendLayout();
-            this.SuspendLayout();
+            panel1 = new Panel();
+            label1 = new Label();
+            pictureBox1 = new PictureBox();
+            panel2 = new Panel();
+            lblStatus = new Label();
+            chkShowPassword = new CheckBox();
+            btnLogin = new Button();
+            txtPassword = new TextBox();
+            label3 = new Label();
+            txtUsername = new TextBox();
+            label2 = new Label();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            panel2.SuspendLayout();
+            SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(300, 450);
-            this.panel1.TabIndex = 0;
+            panel1.BackColor = Color.FromArgb(0, 122, 204);
+            panel1.Controls.Add(label1);
+            panel1.Controls.Add(pictureBox1);
+            panel1.Dock = DockStyle.Left;
+            panel1.Location = new Point(0, 0);
+            panel1.Margin = new Padding(4, 3, 4, 3);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(350, 519);
+            panel1.TabIndex = 0;
             // 
             // label1
             // 
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(12, 260);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(276, 100);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "ASLIYÜKSEK MOTORS\r\nYÖNETİM SİSTEMİ";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            label1.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            label1.ForeColor = Color.White;
+            label1.Location = new Point(14, 300);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(322, 115);
+            label1.TabIndex = 1;
+            label1.Text = "ASLIYÜKSEK MOTORS\r\nYÖNETİM SİSTEMİ";
+            label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(75, 84);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(150, 150);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            pictureBox1.Image = Properties.Resources.saf_black_logo;
+            pictureBox1.Location = new Point(88, 97);
+            pictureBox1.Margin = new Padding(4, 3, 4, 3);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(175, 173);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
             // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.lblStatus);
-            this.panel2.Controls.Add(this.chkShowPassword);
-            this.panel2.Controls.Add(this.btnLogin);
-            this.panel2.Controls.Add(this.txtPassword);
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Controls.Add(this.txtUsername);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(300, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(500, 450);
-            this.panel2.TabIndex = 1;
+            panel2.Controls.Add(lblStatus);
+            panel2.Controls.Add(chkShowPassword);
+            panel2.Controls.Add(btnLogin);
+            panel2.Controls.Add(txtPassword);
+            panel2.Controls.Add(label3);
+            panel2.Controls.Add(txtUsername);
+            panel2.Controls.Add(label2);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(350, 0);
+            panel2.Margin = new Padding(4, 3, 4, 3);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(583, 519);
+            panel2.TabIndex = 1;
             // 
             // lblStatus
             // 
-            this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.lblStatus.ForeColor = System.Drawing.Color.Gray;
-            this.lblStatus.Location = new System.Drawing.Point(75, 309);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(350, 23);
-            this.lblStatus.TabIndex = 6;
-            this.lblStatus.Text = "Lütfen giriş bilgilerinizi giriniz.";
-            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            lblStatus.ForeColor = Color.Gray;
+            lblStatus.Location = new Point(88, 357);
+            lblStatus.Margin = new Padding(4, 0, 4, 0);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(408, 27);
+            lblStatus.TabIndex = 6;
+            lblStatus.Text = "Lütfen giriş bilgilerinizi giriniz.";
+            lblStatus.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // chkShowPassword
             // 
-            this.chkShowPassword.AutoSize = true;
-            this.chkShowPassword.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.chkShowPassword.Location = new System.Drawing.Point(75, 236);
-            this.chkShowPassword.Name = "chkShowPassword";
-            this.chkShowPassword.Size = new System.Drawing.Size(101, 19);
-            this.chkShowPassword.TabIndex = 5;
-            this.chkShowPassword.Text = "Şifreyi Göster";
-            this.chkShowPassword.UseVisualStyleBackColor = true;
+            chkShowPassword.AutoSize = true;
+            chkShowPassword.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            chkShowPassword.Location = new Point(88, 272);
+            chkShowPassword.Margin = new Padding(4, 3, 4, 3);
+            chkShowPassword.Name = "chkShowPassword";
+            chkShowPassword.Size = new Size(95, 19);
+            chkShowPassword.TabIndex = 5;
+            chkShowPassword.Text = "Şifreyi Göster";
+            chkShowPassword.UseVisualStyleBackColor = true;
             // 
             // btnLogin
             // 
-            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.btnLogin.FlatAppearance.BorderSize = 0;
-            this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(75, 260);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(350, 40);
-            this.btnLogin.TabIndex = 4;
-            this.btnLogin.Text = "Giriş Yap";
-            this.btnLogin.UseVisualStyleBackColor = false;
+            btnLogin.BackColor = Color.FromArgb(0, 122, 204);
+            btnLogin.FlatAppearance.BorderSize = 0;
+            btnLogin.FlatStyle = FlatStyle.Flat;
+            btnLogin.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            btnLogin.ForeColor = Color.White;
+            btnLogin.Location = new Point(88, 300);
+            btnLogin.Margin = new Padding(4, 3, 4, 3);
+            btnLogin.Name = "btnLogin";
+            btnLogin.Size = new Size(408, 46);
+            btnLogin.TabIndex = 4;
+            btnLogin.Text = "Giriş Yap";
+            btnLogin.UseVisualStyleBackColor = false;
             // 
             // txtPassword
             // 
-            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.txtPassword.Location = new System.Drawing.Point(75, 200);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(350, 29);
-            this.txtPassword.TabIndex = 3;
+            txtPassword.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            txtPassword.Location = new Point(88, 231);
+            txtPassword.Margin = new Padding(4, 3, 4, 3);
+            txtPassword.Name = "txtPassword";
+            txtPassword.PasswordChar = '*';
+            txtPassword.Size = new Size(408, 29);
+            txtPassword.TabIndex = 3;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label3.Location = new System.Drawing.Point(75, 176);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(42, 21);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Şifre";
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label3.Location = new Point(88, 203);
+            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(42, 21);
+            label3.TabIndex = 2;
+            label3.Text = "Şifre";
             // 
             // txtUsername
             // 
-            this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.txtUsername.Location = new System.Drawing.Point(75, 140);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(350, 29);
-            this.txtUsername.TabIndex = 1;
+            txtUsername.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            txtUsername.Location = new Point(88, 162);
+            txtUsername.Margin = new Padding(4, 3, 4, 3);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(408, 29);
+            txtUsername.TabIndex = 1;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label2.Location = new System.Drawing.Point(75, 116);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(95, 21);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Kullanıcı Adı";
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label2.Location = new Point(88, 134);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(95, 21);
+            label2.TabIndex = 0;
+            label2.Text = "Kullanıcı Adı";
             // 
             // LoginForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.Name = "LoginForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Aslıyüksek Motors - Giriş";
-            this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.White;
+            ClientSize = new Size(933, 519);
+            Controls.Add(panel2);
+            Controls.Add(panel1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Margin = new Padding(4, 3, 4, 3);
+            MaximizeBox = false;
+            Name = "LoginForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Aslıyüksek Motors - Giriş";
+            panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            ResumeLayout(false);
 
         }
 
