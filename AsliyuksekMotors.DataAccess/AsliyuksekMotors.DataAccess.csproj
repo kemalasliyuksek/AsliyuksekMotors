@@ -93,7 +93,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AracMarkaRepository.cs" />
     <Compile Include="AracRepository.cs" />
     <Compile Include="DashboardRepository.cs" />
     <Compile Include="DbConnection.cs" />
