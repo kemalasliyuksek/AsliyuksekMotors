@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using AsliyuksekMotors.Entities;
 using System.Security.Cryptography;
 using System.Text;
+using System.Diagnostics;
 
 namespace AsliyuksekMotors.DataAccess
 {
@@ -11,106 +12,172 @@ namespace AsliyuksekMotors.DataAccess
     {
         private string SifreHashle(string sifre)
         {
-            using (SHA256 sha256Hash = SHA256.Create())
+            try
             {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(sifre));
-
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
+                using (SHA256 sha256Hash = SHA256.Create())
                 {
-                    builder.Append(bytes[i].ToString("x2"));
+                    byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(sifre));
+
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < bytes.Length; i++)
+                    {
+                        builder.Append(bytes[i].ToString("x2"));
+                    }
+                    string hashedPassword = builder.ToString();
+                    Debug.WriteLine($"Şifre hash'lendi: '{sifre}' -> '{hashedPassword}'");
+                    return hashedPassword;
                 }
-                return builder.ToString();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Şifre hash'leme hatası: {ex.Message}");
+                throw;
             }
         }
 
         public int Ekle(Kullanici kullanici)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string query = @"INSERT INTO Kullanicilar 
-                    (Ad, Soyad, KullaniciAdi, Sifre, Email, Telefon, 
-                    RolID, SubeID, SonGirisTarihi, Durum) 
-                VALUES 
-                    (@Ad, @Soyad, @KullaniciAdi, @Sifre, @Email, @Telefon, 
-                    @RolID, @SubeID, @SonGirisTarihi, @Durum);
-                SELECT LAST_INSERT_ID();";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    // Şifreyi hashle
-                    string hashedSifre = SifreHashle(kullanici.Sifre);
+                    string query = @"INSERT INTO Kullanicilar 
+                        (KullaniciAdi, Sifre, Ad, Soyad, Email, Telefon, 
+                        RolID, SubeID, SonGirisTarihi, AktifMi) 
+                    VALUES 
+                        (@KullaniciAdi, @Sifre, @Ad, @Soyad, @Email, @Telefon, 
+                        @RolID, @SubeID, @SonGirisTarihi, @AktifMi);
+                    SELECT LAST_INSERT_ID();";
 
-                    cmd.Parameters.AddWithValue("@Ad", kullanici.Ad);
-                    cmd.Parameters.AddWithValue("@Soyad", kullanici.Soyad);
-                    cmd.Parameters.AddWithValue("@KullaniciAdi", kullanici.KullaniciAdi);
-                    cmd.Parameters.AddWithValue("@Sifre", hashedSifre);
-                    cmd.Parameters.AddWithValue("@Email", kullanici.Email);
-                    cmd.Parameters.AddWithValue("@Telefon", kullanici.Telefon);
-                    cmd.Parameters.AddWithValue("@RolID", kullanici.RolID);
-                    cmd.Parameters.AddWithValue("@SubeID", kullanici.SubeID);
-                    cmd.Parameters.AddWithValue("@SonGirisTarihi", kullanici.SonGirisTarihi);
-                    cmd.Parameters.AddWithValue("@Durum", kullanici.Durum);
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        // Şifreyi hashle
+                        string hashedSifre = SifreHashle(kullanici.Sifre);
 
-                    return Convert.ToInt32(cmd.ExecuteScalar());
+                        cmd.Parameters.AddWithValue("@KullaniciAdi", kullanici.KullaniciAdi);
+                        cmd.Parameters.AddWithValue("@Sifre", hashedSifre);
+                        cmd.Parameters.AddWithValue("@Ad", kullanici.Ad);
+                        cmd.Parameters.AddWithValue("@Soyad", kullanici.Soyad);
+                        cmd.Parameters.AddWithValue("@Email", kullanici.Email);
+                        cmd.Parameters.AddWithValue("@Telefon", kullanici.Telefon);
+                        cmd.Parameters.AddWithValue("@RolID", kullanici.RolID);
+                        cmd.Parameters.AddWithValue("@SubeID", kullanici.SubeID);
+                        cmd.Parameters.AddWithValue("@SonGirisTarihi", kullanici.SonGirisTarihi);
+                        cmd.Parameters.AddWithValue("@AktifMi", kullanici.Durum);
+
+                        int result = Convert.ToInt32(cmd.ExecuteScalar());
+                        Debug.WriteLine($"Kullanıcı eklendi: ID={result}, KullaniciAdi={kullanici.KullaniciAdi}");
+                        return result;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Kullanıcı ekleme hatası: {ex.Message}");
+                throw;
             }
         }
 
         public Kullanici GirisYap(string kullaniciAdi, string sifre)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string hashedSifre = SifreHashle(sifre);
-                string query = "SELECT * FROM Kullanicilar WHERE KullaniciAdi = @KullaniciAdi AND Sifre = @Sifre AND Durum = true";
+                Debug.WriteLine($"GirisYap metodu çağrıldı: KullaniciAdi={kullaniciAdi}");
 
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    cmd.Parameters.AddWithValue("@KullaniciAdi", kullaniciAdi);
-                    cmd.Parameters.AddWithValue("@Sifre", hashedSifre);
+                    // Şifreyi hash'le
+                    string hashedSifre = SifreHashle(sifre);
 
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    // Veritabanında test sorgulama (debug amaçlı)
+                    string testQuery = "SELECT COUNT(*) FROM Kullanicilar";
+                    using (MySqlCommand testCmd = new MySqlCommand(testQuery, connection))
                     {
-                        if (reader.Read())
-                        {
-                            // Son giriş tarihini güncelle
-                            AktifKullaniciGuncelle(Convert.ToInt32(reader["KullaniciID"]));
+                        int count = Convert.ToInt32(testCmd.ExecuteScalar());
+                        Debug.WriteLine($"Veritabanındaki toplam kullanıcı sayısı: {count}");
+                    }
 
-                            return new Kullanici
+                    // Şimdi asıl sorguyu yap
+                    // Kullanıcı adı ve hashlenmis sifreyi kullanarak kullanıcıyı bul
+                    string query = @"SELECT * FROM Kullanicilar 
+                                    WHERE KullaniciAdi = @KullaniciAdi 
+                                    AND Sifre = @Sifre 
+                                    AND AktifMi = 1";
+
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@KullaniciAdi", kullaniciAdi);
+                        cmd.Parameters.AddWithValue("@Sifre", hashedSifre);
+
+                        Debug.WriteLine($"Şu SQL çalıştırılıyor: {cmd.CommandText} " +
+                                      $"Parametreler: KullaniciAdi='{kullaniciAdi}', HashedSifre='{hashedSifre}'");
+
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
                             {
-                                KullaniciID = Convert.ToInt32(reader["KullaniciID"]),
-                                Ad = reader["Ad"].ToString(),
-                                Soyad = reader["Soyad"].ToString(),
-                                KullaniciAdi = reader["KullaniciAdi"].ToString(),
-                                Email = reader["Email"].ToString(),
-                                Telefon = reader["Telefon"].ToString(),
-                                RolID = Convert.ToInt32(reader["RolID"]),
-                                SubeID = Convert.ToInt32(reader["SubeID"]),
-                                SonGirisTarihi = reader["SonGirisTarihi"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["SonGirisTarihi"])
-                                    : (DateTime?)null,
-                                Durum = Convert.ToBoolean(reader["Durum"])
-                            };
+                                var kullanici = new Kullanici
+                                {
+                                    KullaniciID = Convert.ToInt32(reader["KullaniciID"]),
+                                    Ad = reader["Ad"].ToString(),
+                                    Soyad = reader["Soyad"].ToString(),
+                                    KullaniciAdi = reader["KullaniciAdi"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Telefon = reader["Telefon"].ToString(),
+                                    RolID = Convert.ToInt32(reader["RolID"]),
+                                    SubeID = reader["SubeID"] != DBNull.Value ? Convert.ToInt32(reader["SubeID"]) : 0,
+                                    SonGirisTarihi = reader["SonGirisTarihi"] != DBNull.Value
+                                        ? Convert.ToDateTime(reader["SonGirisTarihi"])
+                                        : (DateTime?)null,
+                                    Durum = Convert.ToBoolean(reader["AktifMi"])
+                                };
+
+                                Debug.WriteLine($"Kullanıcı bulundu: ID={kullanici.KullaniciID}, Ad={kullanici.Ad}, Soyad={kullanici.Soyad}");
+
+                                // Son giriş tarihini güncelleyelim
+                                AktifKullaniciGuncelle(kullanici.KullaniciID);
+
+                                return kullanici;
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Eşleşen kullanıcı bulunamadı");
+                                return null;
+                            }
                         }
                     }
                 }
             }
-            return null;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GirisYap metodu hatası: {ex.Message}");
+                Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         private void AktifKullaniciGuncelle(int kullaniciId)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string query = "UPDATE Kullanicilar SET SonGirisTarihi = @SonGirisTarihi WHERE KullaniciID = @KullaniciID";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    cmd.Parameters.AddWithValue("@SonGirisTarihi", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+                    string query = "UPDATE Kullanicilar SET SonGirisTarihi = @SonGirisTarihi WHERE KullaniciID = @KullaniciID";
 
-                    cmd.ExecuteNonQuery();
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@SonGirisTarihi", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+
+                        int affectedRows = cmd.ExecuteNonQuery();
+                        Debug.WriteLine($"Son giriş tarihi güncellendi: KullaniciID={kullaniciId}, Etkilenen satır={affectedRows}");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Son giriş tarihi güncelleme hatası: {ex.Message}");
+                // Bu hatayı yakalayıp logluyoruz ama fırlatmıyoruz çünkü kritik bir işlem değil
             }
         }
 
@@ -118,155 +185,207 @@ namespace AsliyuksekMotors.DataAccess
         {
             List<Kullanici> kullaniciListesi = new List<Kullanici>();
 
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string query = "SELECT * FROM Kullanicilar";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    string query = "SELECT * FROM Kullanicilar";
+
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
                     {
-                        while (reader.Read())
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            kullaniciListesi.Add(new Kullanici
+                            while (reader.Read())
                             {
-                                KullaniciID = Convert.ToInt32(reader["KullaniciID"]),
-                                Ad = reader["Ad"].ToString(),
-                                Soyad = reader["Soyad"].ToString(),
-                                KullaniciAdi = reader["KullaniciAdi"].ToString(),
-                                Email = reader["Email"].ToString(),
-                                Telefon = reader["Telefon"].ToString(),
-                                RolID = Convert.ToInt32(reader["RolID"]),
-                                SubeID = Convert.ToInt32(reader["SubeID"]),
-                                SonGirisTarihi = reader["SonGirisTarihi"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["SonGirisTarihi"])
-                                    : (DateTime?)null,
-                                Durum = Convert.ToBoolean(reader["Durum"])
-                            });
+                                kullaniciListesi.Add(new Kullanici
+                                {
+                                    KullaniciID = Convert.ToInt32(reader["KullaniciID"]),
+                                    Ad = reader["Ad"].ToString(),
+                                    Soyad = reader["Soyad"].ToString(),
+                                    KullaniciAdi = reader["KullaniciAdi"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Telefon = reader["Telefon"].ToString(),
+                                    RolID = Convert.ToInt32(reader["RolID"]),
+                                    SubeID = reader["SubeID"] != DBNull.Value ? Convert.ToInt32(reader["SubeID"]) : 0,
+                                    SonGirisTarihi = reader["SonGirisTarihi"] != DBNull.Value
+                                        ? Convert.ToDateTime(reader["SonGirisTarihi"])
+                                        : (DateTime?)null,
+                                    Durum = Convert.ToBoolean(reader["AktifMi"])
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            return kullaniciListesi;
+                Debug.WriteLine($"Toplam {kullaniciListesi.Count} kullanıcı listelendi");
+                return kullaniciListesi;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Kullanıcı listesi hatası: {ex.Message}");
+                throw;
+            }
         }
 
         public Kullanici KullaniciGetirById(int kullaniciId)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string query = "SELECT * FROM Kullanicilar WHERE KullaniciID = @KullaniciID";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+                    string query = "SELECT * FROM Kullanicilar WHERE KullaniciID = @KullaniciID";
 
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
                     {
-                        if (reader.Read())
+                        cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            return new Kullanici
+                            if (reader.Read())
                             {
-                                KullaniciID = Convert.ToInt32(reader["KullaniciID"]),
-                                Ad = reader["Ad"].ToString(),
-                                Soyad = reader["Soyad"].ToString(),
-                                KullaniciAdi = reader["KullaniciAdi"].ToString(),
-                                Email = reader["Email"].ToString(),
-                                Telefon = reader["Telefon"].ToString(),
-                                RolID = Convert.ToInt32(reader["RolID"]),
-                                SubeID = Convert.ToInt32(reader["SubeID"]),
-                                SonGirisTarihi = reader["SonGirisTarihi"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["SonGirisTarihi"])
-                                    : (DateTime?)null,
-                                Durum = Convert.ToBoolean(reader["Durum"])
-                            };
+                                var kullanici = new Kullanici
+                                {
+                                    KullaniciID = Convert.ToInt32(reader["KullaniciID"]),
+                                    Ad = reader["Ad"].ToString(),
+                                    Soyad = reader["Soyad"].ToString(),
+                                    KullaniciAdi = reader["KullaniciAdi"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Telefon = reader["Telefon"].ToString(),
+                                    RolID = Convert.ToInt32(reader["RolID"]),
+                                    SubeID = reader["SubeID"] != DBNull.Value ? Convert.ToInt32(reader["SubeID"]) : 0,
+                                    SonGirisTarihi = reader["SonGirisTarihi"] != DBNull.Value
+                                        ? Convert.ToDateTime(reader["SonGirisTarihi"])
+                                        : (DateTime?)null,
+                                    Durum = Convert.ToBoolean(reader["AktifMi"])
+                                };
+
+                                Debug.WriteLine($"Kullanıcı bulundu: ID={kullanici.KullaniciID}");
+                                return kullanici;
+                            }
                         }
                     }
                 }
-            }
 
-            return null;
+                Debug.WriteLine($"Kullanıcı bulunamadı: ID={kullaniciId}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Kullanıcı getirme hatası: {ex.Message}");
+                throw;
+            }
         }
 
         public bool Guncelle(Kullanici kullanici)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string query = @"UPDATE Kullanicilar SET 
-                    Ad = @Ad, 
-                    Soyad = @Soyad, 
-                    KullaniciAdi = @KullaniciAdi, 
-                    Email = @Email, 
-                    Telefon = @Telefon, 
-                    RolID = @RolID, 
-                    SubeID = @SubeID, 
-                    Durum = @Durum 
-                WHERE KullaniciID = @KullaniciID";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    cmd.Parameters.AddWithValue("@KullaniciID", kullanici.KullaniciID);
-                    cmd.Parameters.AddWithValue("@Ad", kullanici.Ad);
-                    cmd.Parameters.AddWithValue("@Soyad", kullanici.Soyad);
-                    cmd.Parameters.AddWithValue("@KullaniciAdi", kullanici.KullaniciAdi);
-                    cmd.Parameters.AddWithValue("@Email", kullanici.Email);
-                    cmd.Parameters.AddWithValue("@Telefon", kullanici.Telefon);
-                    cmd.Parameters.AddWithValue("@RolID", kullanici.RolID);
-                    cmd.Parameters.AddWithValue("@SubeID", kullanici.SubeID);
-                    cmd.Parameters.AddWithValue("@Durum", kullanici.Durum);
+                    string query = @"UPDATE Kullanicilar SET 
+                        Ad = @Ad, 
+                        Soyad = @Soyad, 
+                        KullaniciAdi = @KullaniciAdi, 
+                        Email = @Email, 
+                        Telefon = @Telefon, 
+                        RolID = @RolID, 
+                        SubeID = @SubeID, 
+                        AktifMi = @AktifMi 
+                    WHERE KullaniciID = @KullaniciID";
 
-                    return cmd.ExecuteNonQuery() > 0;
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@KullaniciID", kullanici.KullaniciID);
+                        cmd.Parameters.AddWithValue("@Ad", kullanici.Ad);
+                        cmd.Parameters.AddWithValue("@Soyad", kullanici.Soyad);
+                        cmd.Parameters.AddWithValue("@KullaniciAdi", kullanici.KullaniciAdi);
+                        cmd.Parameters.AddWithValue("@Email", kullanici.Email);
+                        cmd.Parameters.AddWithValue("@Telefon", kullanici.Telefon);
+                        cmd.Parameters.AddWithValue("@RolID", kullanici.RolID);
+                        cmd.Parameters.AddWithValue("@SubeID", kullanici.SubeID);
+                        cmd.Parameters.AddWithValue("@AktifMi", kullanici.Durum);
+
+                        int affectedRows = cmd.ExecuteNonQuery();
+                        Debug.WriteLine($"Kullanıcı güncellendi: ID={kullanici.KullaniciID}, Etkilenen satır={affectedRows}");
+                        return affectedRows > 0;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Kullanıcı güncelleme hatası: {ex.Message}");
+                throw;
             }
         }
 
         public bool SifreDegistir(int kullaniciId, string eskiSifre, string yeniSifre)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                // Önce eski şifreyi kontrol et
-                string kontrolQuery = "SELECT * FROM Kullanicilar WHERE KullaniciID = @KullaniciID AND Sifre = @EskiSifre";
-
-                using (MySqlCommand kontrolCmd = new MySqlCommand(kontrolQuery, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    kontrolCmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
-                    kontrolCmd.Parameters.AddWithValue("@EskiSifre", SifreHashle(eskiSifre));
+                    // Önce eski şifreyi kontrol et
+                    string kontrolQuery = "SELECT * FROM Kullanicilar WHERE KullaniciID = @KullaniciID AND Sifre = @EskiSifre";
 
-                    using (MySqlDataReader reader = kontrolCmd.ExecuteReader())
+                    using (MySqlCommand kontrolCmd = new MySqlCommand(kontrolQuery, connection))
                     {
-                        if (!reader.Read())
+                        kontrolCmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+                        kontrolCmd.Parameters.AddWithValue("@EskiSifre", SifreHashle(eskiSifre));
+
+                        using (MySqlDataReader reader = kontrolCmd.ExecuteReader())
                         {
-                            // Eski şifre yanlış
-                            return false;
+                            if (!reader.Read())
+                            {
+                                // Eski şifre yanlış
+                                Debug.WriteLine($"Şifre değiştirme başarısız: Eski şifre yanlış, KullaniciID={kullaniciId}");
+                                return false;
+                            }
                         }
                     }
+
+                    // Yeni şifreyi hashleyip güncelle
+                    string guncelleQuery = "UPDATE Kullanicilar SET Sifre = @YeniSifre WHERE KullaniciID = @KullaniciID";
+
+                    using (MySqlCommand cmd = new MySqlCommand(guncelleQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+                        cmd.Parameters.AddWithValue("@YeniSifre", SifreHashle(yeniSifre));
+
+                        int affectedRows = cmd.ExecuteNonQuery();
+                        Debug.WriteLine($"Şifre değiştirildi: KullaniciID={kullaniciId}, Etkilenen satır={affectedRows}");
+                        return affectedRows > 0;
+                    }
                 }
-
-                // Yeni şifreyi hashleyip güncelle
-                string guncelleQuery = "UPDATE Kullanicilar SET Sifre = @YeniSifre WHERE KullaniciID = @KullaniciID";
-
-                using (MySqlCommand cmd = new MySqlCommand(guncelleQuery, connection))
-                {
-                    cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
-                    cmd.Parameters.AddWithValue("@YeniSifre", SifreHashle(yeniSifre));
-
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Şifre değiştirme hatası: {ex.Message}");
+                throw;
             }
         }
 
         public bool Sil(int kullaniciId)
         {
-            using (MySqlConnection connection = DbConnection.GetConnection())
+            try
             {
-                string query = "DELETE FROM Kullanicilar WHERE KullaniciID = @KullaniciID";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = DbConnection.GetConnection())
                 {
-                    cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+                    string query = "DELETE FROM Kullanicilar WHERE KullaniciID = @KullaniciID";
 
-                    return cmd.ExecuteNonQuery() > 0;
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@KullaniciID", kullaniciId);
+
+                        int affectedRows = cmd.ExecuteNonQuery();
+                        Debug.WriteLine($"Kullanıcı silindi: KullaniciID={kullaniciId}, Etkilenen satır={affectedRows}");
+                        return affectedRows > 0;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Kullanıcı silme hatası: {ex.Message}");
+                throw;
             }
         }
     }

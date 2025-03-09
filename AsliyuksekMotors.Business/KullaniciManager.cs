@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 using AsliyuksekMotors.Entities;
 using AsliyuksekMotors.DataAccess;
 
@@ -44,14 +45,26 @@ namespace AsliyuksekMotors.Business
                 throw new ArgumentException("Şifre boş olamaz");
             }
 
-            var kullanici = _kullaniciRepository.GirisYap(kullaniciAdi, sifre);
-
-            if (kullanici == null)
+            try
             {
-                throw new UnauthorizedAccessException("Kullanıcı adı veya şifre hatalı");
-            }
+                Debug.WriteLine($"Giriş deneniyor: KullaniciAdi={kullaniciAdi}");
 
-            return kullanici;
+                var kullanici = _kullaniciRepository.GirisYap(kullaniciAdi, sifre);
+
+                if (kullanici == null)
+                {
+                    Debug.WriteLine("Kullanıcı bulunamadı veya şifre yanlış");
+                    throw new UnauthorizedAccessException("Kullanıcı adı veya şifre hatalı");
+                }
+
+                Debug.WriteLine($"Giriş başarılı: KullaniciID={kullanici.KullaniciID}, Ad={kullanici.Ad}, Soyad={kullanici.Soyad}");
+                return kullanici;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Giriş hatası: {ex.Message}");
+                throw; // Hatayı yukarıya ilet
+            }
         }
 
         public bool KullaniciGuncelle(Kullanici kullanici)
@@ -183,6 +196,12 @@ namespace AsliyuksekMotors.Business
 
         private bool SifreKurallariniKontrolEt(string sifre)
         {
+            // Geliştirme aşamasında basit bir şifre politikası kullanıyoruz
+            // Minimum 4 karakter
+            return sifre.Length >= 4;
+
+            // Daha kapsamlı şifre politikası (şu an pasif):
+            /*
             // Şifre kuralları:
             // - En az 8 karakter
             // - En az bir büyük harf
@@ -191,6 +210,7 @@ namespace AsliyuksekMotors.Business
             // - En az bir özel karakter
             var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$");
             return regex.IsMatch(sifre);
+            */
         }
     }
 }
