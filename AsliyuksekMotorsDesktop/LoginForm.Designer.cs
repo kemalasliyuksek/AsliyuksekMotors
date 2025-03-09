@@ -39,6 +39,7 @@
             txtBoxPassword.Font = new Font("Segoe UI", 12F);
             txtBoxPassword.Location = new Point(250, 244);
             txtBoxPassword.Name = "txtBoxPassword";
+            txtBoxPassword.PasswordChar = '*';
             txtBoxPassword.Size = new Size(300, 29);
             txtBoxPassword.TabIndex = 0;
             txtBoxPassword.TextAlign = HorizontalAlignment.Center;
