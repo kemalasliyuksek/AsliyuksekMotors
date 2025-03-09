@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AracRepository.cs" />
+    <Compile Include="DashboardRepository.cs" />
     <Compile Include="DbConnection.cs" />
     <Compile Include="KullaniciRepository.cs" />
     <Compile Include="MusteriRepository.cs" />

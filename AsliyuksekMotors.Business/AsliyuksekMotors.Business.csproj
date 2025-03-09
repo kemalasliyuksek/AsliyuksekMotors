@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AracManager.cs" />
+    <Compile Include="DashboardManager.cs" />
     <Compile Include="KullaniciManager.cs" />
     <Compile Include="MusteriManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
